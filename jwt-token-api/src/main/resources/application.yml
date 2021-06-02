@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: jwt-api
+
+management:
+  endpoints:
+    web:
+      exposure.include: "beans,env,health,info,metrics,mappings"
+  endpoint:
+    health:
+      show-details: always
+
+keycloak:
+  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth
+  realm: jwt-services
+  resource: jwt-app
+  ssl-required: external
+  principal-attribute: preferred_username
+  use-resource-role-mappings: true

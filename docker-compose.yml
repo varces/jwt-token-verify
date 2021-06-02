@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+
+  mysql:
+    image: mysql:5.7.30
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+
+  keycloak:
+    image: jboss/keycloak:10.0.2
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=mysql
+      - DB_ADDR=mysql
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
+      - JDBC_PARAMS=useSSL=false
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  # App backend service
+  jwt-api:
+    # Configuration for building the docker image for the backend service
+    build:
+      context: jwt-token-api # Use an image built from the specified dockerfile
+      dockerfile: Dockerfile
+    environment:
+      - KEYCLOAK_HOST=keycloak
+    ports:
+      - "9080:8080"
+    restart: unless-stopped
+    depends_on: 
+      - keycloak
+
+
